@@ -62,7 +62,7 @@ This project presents an autonomous fire-fighting robot built using an Arduino m
 
 ---
 
-### License
+## License
 This project is open-source under the MIT License.
 
 ---
