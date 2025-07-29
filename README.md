@@ -68,4 +68,5 @@ This project is open-source under the MIT License.
 ---
 
 ### Contact
-For questions or support, please open an issue or contact [your-email@example.com].
+For questions or support, please open an issue or contact [firerobot@gmail
+.com].
