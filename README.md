@@ -1,5 +1,5 @@
 # DIY-FIRE-FIGHTING-ROBOT-CAR
-An autonomous Arduino-based fire-fighting robot that detects fire using IR flame sensors and extinguishes it with a water pump. It navigates toward flames, reducing human risk in hazardous areas. Features motorized movement, sensor integration, and automated extinguishing. Code is in C/C++ for real-time control.
+An autonomous ESP-32 based fire-fighting robot that detects fire using IR flame sensors and extinguishes it with a water pump. It navigates toward flames, reducing human risk in hazardous areas. Features motorized movement, sensor integration, and automated extinguishing. Code is in C/C++ for real-time control.
 
 # DIY Fire Fighting Robot | Auto Fire Chaser & Extinguisher
 
@@ -17,7 +17,7 @@ This project presents an autonomous fire-fighting robot built using an Arduino m
 ## Components Used
 | Component                  | Quantity | Purpose                                |
 |----------------------------|----------|---------------------------------------|
-| Arduino UNO                | 1        | Microcontroller                        |
+| ESP - 32                   | 1        | Microcontroller                        |
 | IR 4-Pin Flame Sensors     | 3        | Fire detection                        |
 | BO DC Gear Motors          | 4        | Movement                             |
 | L298 Motor Driver          | 1        | Motor control                        |
@@ -26,7 +26,6 @@ This project presents an autonomous fire-fighting robot built using an Arduino m
 | Water Tank / Bottle        | 1        | Water storage                       |
 | 3.7V 18650 Batteries       | 2        | Power supply                       |
 | TIP-122 Transistor + Capacitor + Resistor | 1 set  | Control high current devices       |
-| Solder-less Breadboard     | 1        | Circuit prototyping                  |
 | Jumper Wires               | -        | Electrical connections               |
 | Chassis                   | 1        | Robot structure                     |
 
