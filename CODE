@@ -1,135 +1,159 @@
-#define enA 10 //Enable1 L298 Pin enA
-#define in1 9  //Motor1 L298 Pin in1
-#define in2 8  //Motor1 L298 Pin in2
-#define in3 7  //Motor2 L298 Pin in3
-#define in4 6  //Motor2 L298 Pin in4
-#define enB 5  //Enable2 L298 Pin enB
-#define ir_R A0
-#define ir_F A1
-#define ir_L A2
-#define servo A4
-#define pump A5
+ 
+#include <Servo.h>            
+#include <SoftwareSerial.h>  
 
-int Speed = 160; // Duty Cycle 0 to 255 (Motor Speed)
-int s1, s2, s3;
+Servo myservo;
+ 
+int pos = 0;    
+boolean fire = false;
 
-void setup() {
-  Serial.begin(9600); 
 
-  pinMode(ir_R, INPUT);
-  pinMode(ir_F, INPUT);
-  pinMode(ir_L, INPUT);
+const String PHONE = "+91**********"; //use your number with country code
 
-  pinMode(enA, OUTPUT);
-  pinMode(in1, OUTPUT);
-  pinMode(in2, OUTPUT);
-  pinMode(in3, OUTPUT);
-  pinMode(in4, OUTPUT);
-  pinMode(enB, OUTPUT);
-  pinMode(servo, OUTPUT);
+#define rxPin 2
+#define txPin 3 
+SoftwareSerial sim800L(rxPin,txPin);
+#define Left 4          // left sensor
+#define Right 5         // right sensor
+#define Forward 6       //front sensor
+#define GAS_SENSOR 7    //Gas sensor
+#define LM1 8           // left motor
+#define LM2 9           // left motor
+#define RM1 10          // right motor
+#define RM2 11          // right motor
+#define pump 12         //water pumb
+
+
+
+void setup()
+{
+   
+  Serial.begin(115200);
+ 
+  sim800L.begin(9600);
+
+  sim800L.println("AT");
+  delay(1000);
+  sim800L.println("AT+CMGF=1");
+  delay(1000);
+  
+  pinMode(Left, INPUT);
+  pinMode(Right, INPUT);
+  pinMode(Forward, INPUT);
+  pinMode(GAS_SENSOR, INPUT);
+  pinMode(LM1, OUTPUT);
+  pinMode(LM2, OUTPUT);
+  pinMode(RM1, OUTPUT);
+  pinMode(RM2, OUTPUT);
   pinMode(pump, OUTPUT);
-
-  for (int angle = 90; angle <= 140; angle += 5) servoPulse(servo, angle);
-  for (int angle = 140; angle >= 40; angle -= 5) servoPulse(servo, angle);
-  for (int angle = 40; angle <= 95; angle += 5) servoPulse(servo, angle);
-
-  analogWrite(enA, Speed);
-  analogWrite(enB, Speed);
-
-  delay(500);
-}
-
-void loop() {
-  s1 = analogRead(ir_R);
-  s2 = analogRead(ir_F);
-  s3 = analogRead(ir_L);
-
-  Serial.print(s1); Serial.print("\t");
-  Serial.print(s2); Serial.print("\t");
-  Serial.println(s3);
-
-  delay(50);
-
-  if (s1 < 250) {
-    Stop();
-    digitalWrite(pump, 1);
-    for (int angle = 90; angle >= 40; angle -= 3) servoPulse(servo, angle);
-    for (int angle = 40; angle <= 90; angle += 3) servoPulse(servo, angle);
+ 
+  myservo.attach(13);
+  myservo.write(90); 
+  
+   while(sim800L.available()){
+  Serial.println(sim800L.readString());
   }
-  else if (s2 < 350) {
-    Stop();
-    digitalWrite(pump, 1);
-    for (int angle = 90; angle <= 140; angle += 3) servoPulse(servo, angle);
-    for (int angle = 140; angle >= 40; angle -= 3) servoPulse(servo, angle);
-    for (int angle = 40; angle <= 90; angle += 3) servoPulse(servo, angle);
+  
+}
+ 
+void put_off_fire()
+{
+  
+ 
+ 
+    digitalWrite(LM1, HIGH);
+    digitalWrite(LM2, HIGH);
+    digitalWrite(RM1, HIGH);
+    digitalWrite(RM2, HIGH);
+    digitalWrite(pump,HIGH);
+    delay(500);
+ 
+ 
+    for (pos = 50; pos <= 110; pos += 1) { 
+    myservo.write(pos); 
+    delay(10);  
   }
-  else if (s3 < 250) {
-    Stop();
-    digitalWrite(pump, 1);
-    for (int angle = 90; angle <= 140; angle += 3) servoPulse(servo, angle);
-    for (int angle = 140; angle >= 90; angle -= 3) servoPulse(servo, angle);
+  for (pos = 110; pos >= 50; pos -= 1) { 
+    myservo.write(pos); 
+    delay(10);
   }
-  else if (s1 >= 251 && s1 <= 700) {
-    digitalWrite(pump, 0);
-    backword(); delay(100);
-    turnRight(); delay(200);
-  }
-  else if (s2 >= 251 && s2 <= 800) {
-    digitalWrite(pump, 0);
-    forword();
-  }
-  else if (s3 >= 251 && s3 <= 700) {
-    digitalWrite(pump, 0);
-    backword(); delay(100);
-    turnLeft(); delay(200);
-  }
-  else {
-    digitalWrite(pump, 0);
-    Stop();
-  }
-  delay(10);
+  digitalWrite(pump,LOW);
+  myservo.write(90); 
+  fire=false;
+}
+ 
+void loop()
+{
+
+  
+  myservo.write(90); //Sweep_Servo();  
+  
+  if (digitalRead(Left) ==1 && digitalRead(Right)==1 && digitalRead(Forward) ==1) 
+    {
+    delay(500);
+    digitalWrite(LM1, HIGH);
+    digitalWrite(LM2, HIGH);
+    digitalWrite(RM1, HIGH);
+    digitalWrite(RM2, HIGH);
+    }
+    else if (digitalRead(Forward) ==0) 
+    {
+    digitalWrite(LM1, HIGH);
+    digitalWrite(LM2, LOW);
+    digitalWrite(RM1, HIGH);
+    digitalWrite(RM2, LOW);
+    fire = true;
+    
+    }
+    
+    else if (digitalRead(Left) ==0)
+    {
+    digitalWrite(LM1, HIGH);
+    digitalWrite(LM2, LOW);
+    digitalWrite(RM1, HIGH);
+    digitalWrite(RM2, HIGH);
+    }
+    
+    else if (digitalRead(Right) ==0) 
+    {
+    digitalWrite(LM1, HIGH);
+    digitalWrite(LM2, HIGH);
+    digitalWrite(RM1, HIGH);
+    digitalWrite(RM2, LOW);
+    }
+    delay(400);//change this value to change the distance
+    
+     if(digitalRead(GAS_SENSOR)== 0)
+    {
+     Serial.println("Gas is Detected.");
+      send_sms(); 
+    }
+   
+     while (fire == true)
+     {
+      put_off_fire();
+      Serial.println("Fire Detected.");
+      make_call();
+     }}
+     void make_call()
+{
+    Serial.println("calling....");
+    sim800L.println("ATD"+PHONE+";");
+    delay(20000); //20 sec delay
+    sim800L.println("ATH");
+    delay(1000); //1 sec delay
 }
 
-void servoPulse(int pin, int angle) {
-  int pwm = (angle * 11) + 500;
-  digitalWrite(pin, HIGH);
-  delayMicroseconds(pwm);
-  digitalWrite(pin, LOW);
-  delay(50);
+void send_sms()
+{
+    Serial.println("sending sms....");
+    delay(50);
+    sim800L.print("AT+CMGF=1\r");
+    delay(1000);
+    sim800L.print("AT+CMGS=\""+PHONE+"\"\r");
+    delay(1000);
+    sim800L.print("Gas Detected");
+    delay(100);
+    sim800L.write(0x1A);
+    delay(5000);
 }
-
-void forword() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-}
-
-void backword() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-}
-
-void turnRight() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, HIGH);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, HIGH);
-}
-
-void turnLeft() {
-  digitalWrite(in1, HIGH);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, HIGH);
-  digitalWrite(in4, LOW);
-}
-
-void Stop() {
-  digitalWrite(in1, LOW);
-  digitalWrite(in2, LOW);
-  digitalWrite(in3, LOW);
-  digitalWrite(in4, LOW);
-}
-
